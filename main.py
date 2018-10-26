@@ -84,8 +84,7 @@ def main():
         GPIO.setup(RELAY_PIN, GPIO.OUT)
         GPIO.output(RELAY_PIN, GPIO.LOW)
         heating = False
-        logging.info("Initialized thermostatd with pin %d as actuator", RELAY_PIN,
-                     args['target_temp'])
+        logging.info("Initialized thermostatd with pin %d as actuator", RELAY_PIN)
         while should_run:
             now = datetime.now()
             hour = now.hour

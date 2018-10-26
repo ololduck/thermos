@@ -12,7 +12,9 @@
 
 - name: Python is installed
   package:
-    name: python
+    name:
+      - python
+      - python-toml
     state: present
 
 - name: Git is installed
@@ -37,7 +39,7 @@
     src: /opt/thermos/thermos.sample.toml
     dest: /etc/thermos.toml
     remote_src: true
-  notify: restart service
+  notify: Restart service
 
 - name: Install & launch thermostat daemon
   systemd:
