@@ -1,0 +1,8 @@
+---
+- name: install thermos
+  hosts: thermostat
+  roles:
+    - thermos
+  become: true
+  vars:
+    version: develop
