@@ -1,0 +1,13 @@
+---
+# handlers file for thermos
+- name: Restart service
+  service:
+    name: thermostatd
+    state: restarted
+
+- name: modprobe
+  modprobe:
+    name: "{{item}}"
+  with_items:
+    - "w1-gpio"
+    - "w1-therm"

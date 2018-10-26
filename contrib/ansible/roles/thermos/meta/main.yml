@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  author: Paul Ollivier
+  description: Installs the simple home thermostat system "thermos".
+  license: BSD
+  galaxy_tags: []
+
+dependencies: []

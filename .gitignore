@@ -225,3 +225,6 @@ _autosave-*
 *.xml
 *.csv
 
+### Ansible template
+*.retry
+

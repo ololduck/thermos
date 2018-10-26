@@ -1,0 +1,51 @@
+---
+# tasks file for thermos
+- name: Load modules on boot
+  lineinfile:
+    path: /etc/modules
+    line: "{{item}}"
+    state: present
+  with_items:
+    - w1-gpio
+    - w1-therm
+  notify: modprobe
+
+- name: Python is installed
+  package:
+    name:
+      - python
+      - python-toml
+    state: present
+
+- name: Git is installed
+  package:
+    name: git
+    state: present
+    force: true
+
+- name: Get the code
+  git:
+    repo: https://github.com/paulollivier/thermos
+    dest: /opt/thermos
+    version: "{{version}}"
+  notify: Restart service
+
+- name: Copy service file
+  copy:
+    src: thermostatd.service
+    dest: /etc/systemd/system/thermostatd.service
+
+- name: Copy config file
+  copy:
+    src: /opt/thermos/thermos.sample.toml
+    dest: /etc/thermos.toml
+    remote_src: true
+  notify: Restart service
+
+- name: Install & launch thermostat daemon
+  systemd:
+    name: thermostatd
+    state: started
+    enabled: true
+    force: true
+    daemon_reload: true

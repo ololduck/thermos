@@ -1,0 +1,11 @@
+[Unit]
+Description = Thermostat daemon
+
+[Service]
+Type = simple
+PIDFile = /var/run/thermostatd.pid
+EnvironmentFile = -/etc/default/thermostatd
+ExecStart = /usr/bin/python /opt/thermos/main.py -c /etc/thermos.toml
+
+[Install]
+WantedBy = multi-user.target
