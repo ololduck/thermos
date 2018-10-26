@@ -3,12 +3,13 @@ import glob
 import logging
 import time
 from argparse import ArgumentParser
+from signal import SIGINT, signal, SIGTERM
 
 import RPi.GPIO as GPIO
 
 RELAY_PIN = 17
 
-logging.basicConfig()
+logging.basicConfig(level=logging.INFO)
 
 # stolen from:
 #  https://cdn-learn.adafruit.com/downloads/pdf/adafruits-raspberry-pi-lesson-11-ds18b20-temperature-sensing.pdf
@@ -25,6 +26,20 @@ device_folder = devices[0]
 device_file = device_folder + '/w1_slave'
 
 parser = ArgumentParser()
+
+should_run = True
+
+
+# Graceful exit
+def cleanup(signum=None, frame=None):
+    global should_run
+    should_run = False
+    GPIO.output(RELAY_PIN, False)
+    GPIO.cleanup()
+
+
+signal(SIGINT, cleanup)
+signal(SIGTERM, cleanup)
 
 
 def read_temp():
@@ -46,7 +61,7 @@ def read_temp():
 
 
 def update_heating_status(heating):
-    logging.debug("Setting heating to {}".format(heating))
+    logging.debug("Setting heating to %s", heating)
     # The relay is active low....
     GPIO.output(RELAY_PIN, not heating)
 
@@ -65,7 +80,7 @@ def main():
         heating = False
         logging.info("Initialized thermostatd with pin %d as actuator and %f C° as target temperature", RELAY_PIN,
                      args['target_temp'])
-        while True:
+        while should_run:
             temp = read_temp()
             logging.debug("Current temp is %d", temp)
             if temp < args['target_temp'] - args['threshold']:
@@ -78,8 +93,7 @@ def main():
     except KeyboardInterrupt:
         logging.info("Program interrupted by user.")
     finally:
-        GPIO.output(RELAY_PIN, False)
-        GPIO.cleanup()
+        cleanup()
 
 
 if __name__ == "__main__":
