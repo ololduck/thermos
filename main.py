@@ -82,8 +82,8 @@ def main():
     try:
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(RELAY_PIN, GPIO.OUT)
-        GPIO.output(RELAY_PIN, GPIO.LOW)
         heating = False
+        update_heating_status(heating)
         logging.info("Initialized thermostatd with pin %d as actuator", RELAY_PIN)
         while should_run:
             now = datetime.now()
@@ -93,7 +93,7 @@ def main():
                 minutes = 30
             current_scheduled_temperature = config["schedule"]["hourly"]["{:0>2d}:{:0>2d}".format(hour, minutes)]
             temp = read_temp()
-            logging.debug("Current temp is %d", temp)
+            logging.debug("scheduled/current temp are %.2f/%.2f", current_scheduled_temperature, temp)
             if temp < current_scheduled_temperature - args['threshold']:
                 heating = True
             elif temp > current_scheduled_temperature + args["threshold"]:

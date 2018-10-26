@@ -21,6 +21,7 @@
   package:
     name: git
     state: present
+    force: true
 
 - name: Get the code
   git:
