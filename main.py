@@ -17,6 +17,7 @@ base_dir = '/sys/bus/w1/devices/'
 devices = glob.glob(base_dir + '28*')
 if len(devices) < 1:
     print("there doesn't seem to be a temperature probe. Are the modules loaded?")
+    exit(1)
 device_folder = devices[0]
 device_file = device_folder + '/w1_slave'
 
@@ -26,9 +27,9 @@ parser = ArgumentParser()
 def read_temp():
     def read_temp_raw():
         f = open(device_file, 'r')
-        lines = f.readlines()
+        _lines = f.readlines()
         f.close()
-        return lines
+        return _lines
 
     lines = read_temp_raw()
     while lines[0].strip()[-3:] != 'YES':
