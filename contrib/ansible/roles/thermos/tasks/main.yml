@@ -32,10 +32,17 @@
     src: thermostatd.service
     dest: /etc/systemd/system/thermostatd.service
 
+- name: Copy config file
+  copy:
+    src: /opt/thermos/thermos.sample.toml
+    dest: /etc/thermos.toml
+    remote_src: true
+  notify: restart service
 
 - name: Install & launch thermostat daemon
-  service:
+  systemd:
     name: thermostatd
     state: started
     enabled: true
     force: true
+    daemon_reload: true
