@@ -76,7 +76,7 @@ def main():
                         help="how many C° should we allow from the target temperature")
     parser.add_argument("-c", "--config", help="path to the configuration file to use", default="thermos.toml")
     parser.add_argument("--relay-pin", type=int, required=False, help="On which GPIO pin is the relay command input")
-    parser.add_argument("-v", "--verbose", nargs="*", action="count", default=0,
+    parser.add_argument("-v", "--verbose", action="count", default=0,
                         help="Increase verbosity. Can be repeated.")
     args = vars(parser.parse_args())
     logger.setLevel(logging.INFO - args["verbose"] * 10)
