@@ -91,6 +91,8 @@ def main():
             minutes = now.minute
             if minutes > 30:  # we only handle 30 minutes slices
                 minutes = 30
+            else:
+                minutes = 0
             current_scheduled_temperature = config["schedule"]["hourly"]["{:0>2d}:{:0>2d}".format(hour, minutes)]
             temp = read_temp()
             logging.debug("scheduled/current temp are %.2f/%.2f", current_scheduled_temperature, temp)
