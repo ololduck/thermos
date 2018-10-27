@@ -10,7 +10,7 @@ logger = logging.getLogger()
 
 class ThermosActuator(object):
     def __init__(self, config):
-        self.relay_pin = config['relay_pin']
+        self.relay_pin = int(config['relay_pin'])
         self.config = config
         self.should_run = True
         base_dir = '/sys/bus/w1/devices/'
