@@ -8,6 +8,7 @@ from signal import SIGINT, signal, SIGTERM
 import RPi.GPIO as GPIO
 
 from thermos import Config
+from thermos.utils import init_gpios
 
 RELAY_PIN = 17
 
@@ -84,15 +85,12 @@ def main():
     logger.info("Loading config file %s...", args["config"])
     config = Config.load(args["config"])
     config.update(**args)
-    global RELAY_PIN
-    RELAY_PIN = config["relay_pin"]
 
     try:
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(RELAY_PIN, GPIO.OUT)
+        init_gpios(config)
         heating = False
         update_heating_status(heating)
-        logger.info("Initialized thermostatd with pin %d as actuator", RELAY_PIN)
+        logger.info("Initialized thermostatd with pin %d as actuator", config["relay_pin"])
         while should_run:
             scheduled_temp = config.get_current_scheduled_temperature()
             temp = read_temp()

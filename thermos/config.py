@@ -24,7 +24,7 @@ class Config(dict):
         with open(self.config_file, "w+") as f:
             toml.dump(self, f)
 
-    def get_current_scheduled_temperature(self) -> float:
+    def get_current_scheduled_temperature(self):
         now = datetime.now()
         hour = now.hour
         minutes = now.minute

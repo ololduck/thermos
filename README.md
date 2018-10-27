@@ -24,7 +24,7 @@ The choice of python is motivated by the fact that this is still an early stage 
 ## Features wishlist
 
 - Weekly schedules
-- Hourly schedules
+- Hourly schedules - Done!
 - Configuration client(s?)
   - web-based
   - Android?
