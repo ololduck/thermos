@@ -3,7 +3,6 @@ import glob
 import logging
 import time
 from argparse import ArgumentParser
-from datetime import datetime
 from signal import SIGINT, signal, SIGTERM
 
 import RPi.GPIO as GPIO
@@ -12,7 +11,9 @@ from thermos import Config
 
 RELAY_PIN = 17
 
-logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.INFO)
 
 # stolen from:
 #  https://cdn-learn.adafruit.com/downloads/pdf/adafruits-raspberry-pi-lesson-11-ds18b20-temperature-sensing.pdf
@@ -64,7 +65,7 @@ def read_temp():
 
 
 def update_heating_status(heating):
-    logging.debug("Setting heating to %s", heating)
+    logger.debug("Setting heating to %s", heating)
     # The relay is active low....
     GPIO.output(RELAY_PIN, not heating)
 
@@ -73,38 +74,38 @@ def main():
     parser.add_argument("--threshold", type=float, default=0.5,
                         help="how many C° should we allow from the target temperature")
     parser.add_argument("-c", "--config", help="path to the configuration file to use", default="thermos.toml")
+    parser.add_argument("--relay-pin", type=int, required=False, help="On which GPIO pin is the relay command input")
+    parser.add_argument("-v", "--verbose", nargs="*", action="count", default=0,
+                        help="Increase verbosity. Can be repeated.")
     args = vars(parser.parse_args())
-    logging.debug(args)
+    logger.setLevel(logging.INFO - args["verbose"] * 10)
+    logger.debug(args)
 
-    logging.info("Loading config file %s...", args["config"])
+    logger.info("Loading config file %s...", args["config"])
     config = Config.load(args["config"])
+    config.update(**args)
+    global RELAY_PIN
+    RELAY_PIN = config["relay_pin"]
 
     try:
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(RELAY_PIN, GPIO.OUT)
         heating = False
         update_heating_status(heating)
-        logging.info("Initialized thermostatd with pin %d as actuator", RELAY_PIN)
+        logger.info("Initialized thermostatd with pin %d as actuator", RELAY_PIN)
         while should_run:
-            now = datetime.now()
-            hour = now.hour
-            minutes = now.minute
-            if minutes > 30:  # we only handle 30 minutes slices
-                minutes = 30
-            else:
-                minutes = 0
-            current_scheduled_temperature = config["schedule"]["hourly"]["{:0>2d}:{:0>2d}".format(hour, minutes)]
+            scheduled_temp = config.get_current_scheduled_temperature()
             temp = read_temp()
-            logging.debug("scheduled/current temp are %.2f/%.2f", current_scheduled_temperature, temp)
-            if temp < current_scheduled_temperature - args['threshold']:
+            logger.debug("scheduled/current temp are %.2f/%.2f", scheduled_temp, temp)
+            if temp < scheduled_temp - args['threshold']:
                 heating = True
-            elif temp > current_scheduled_temperature + args["threshold"]:
+            elif temp > scheduled_temp + args["threshold"]:
                 heating = False
             update_heating_status(heating)
             time.sleep(10.0)
 
     except KeyboardInterrupt:
-        logging.info("Program interrupted by user.")
+        logger.info("Program interrupted by user.")
     finally:
         cleanup()
 

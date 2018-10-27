@@ -1,6 +1,9 @@
 # This is the sample configuration file
 # in this setup, we maintain a temperature of 15°C during the night, then rise to 18, up to 21 during the day
 
+threshold = 0.5
+relay_pin = 17
+
 [schedule.hourly]
 "00:00" = 18.0
 "00:30" = 15.0
