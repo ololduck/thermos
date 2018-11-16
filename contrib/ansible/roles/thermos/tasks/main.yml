@@ -42,6 +42,11 @@
     remote_src: true
   notify: Restart service
 
+- name: Create influx database
+  influx_database:
+    hostname: localhost
+    name: thermos
+
 - name: Install & launch thermostat daemon
   systemd:
     name: thermostatd

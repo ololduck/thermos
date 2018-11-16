@@ -1,0 +1,42 @@
+---
+# tasks file for influxdb
+- name: Download influxdb
+  get_url:
+    url: https://dl.influxdata.com/influxdb/releases/influxdb-1.7.1_linux_armhf.tar.gz
+    dest: /tmp/influxdb.tgz
+    checksum: sha256:723c33b4cf7714fc0864d7a91de324e84427a25b1ca44eaa891bef82523e110a
+
+
+# The archive already has a full tree. meaning /etc /usr and so on are already included
+- name: Uncompress influxdb
+  unarchive:
+    src: /tmp/influxdb.tgz
+    dest: /tmp/influx
+    remote_src: true
+
+- name: Create Influxdb user
+  user:
+    name: influxdb
+    system: true
+
+- name: install influxdb
+  copy:
+    src: "/tmp/influx/influxdb-1.7.1-1/{{item}}"
+    dest: "/{{item}}"
+    user: influxdb
+    remote_src: true
+  with_items:
+    - etc
+    - usr
+    - var
+
+- name: Install daemon
+  systemd:
+    name: /usr/lib/influxdb/scripts/influxdb.service
+    state: enabled
+    daemon-reload: true
+
+- name: lauch influxdb
+  service:
+    name: influxdb
+    state: started

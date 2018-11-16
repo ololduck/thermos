@@ -73,10 +73,12 @@ class ThermosActuator(object):
         data = {
             'measurement': measurement,
             'time': datetime.now(),
-            'temperature': temp
+            'fields': {
+                'temperature': temp
+            }
         }
         logger.debug('sending to influx the following data: %s', data)
-        self.client.write(data)
+        self.client.write_points([data])
 
     def run(self):
         """Launches the mainloop"""
