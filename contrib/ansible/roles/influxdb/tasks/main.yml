@@ -11,7 +11,7 @@
 - name: Uncompress influxdb
   unarchive:
     src: /tmp/influxdb.tgz
-    dest: /tmp/influx
+    dest: /tmp/
     remote_src: true
 
 - name: Create Influxdb user
@@ -20,23 +20,26 @@
     system: true
 
 - name: install influxdb
-  copy:
-    src: "/tmp/influx/influxdb-1.7.1-1/{{item}}"
-    dest: "/{{item}}"
-    user: influxdb
-    remote_src: true
-  with_items:
-    - etc
-    - usr
-    - var
+  command: "cp -vrf /tmp/influxdb-1.7.1-1/etc /tmp/influxdb-1.7.1-1/usr /tmp/influxdb-1.7.1-1/var /"
+  args:
+    creates:
+      - /var/lib/influxdb
+      - /usr/bin/influxd
+
+
+- name: Change permissions on influx's data dir
+  file:
+    path: /var/lib/influxdb
+    owner: influxdb
+    recurse: true
 
 - name: Install daemon
   systemd:
     name: /usr/lib/influxdb/scripts/influxdb.service
-    state: enabled
-    daemon-reload: true
+    enabled: true
 
-- name: lauch influxdb
+- name: run daemon
   service:
-    name: influxdb
+    name: influxdb.service
     state: started
+    enabled: true
