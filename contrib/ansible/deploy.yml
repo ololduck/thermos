@@ -3,7 +3,6 @@
   hosts: thermostat
   roles:
     - thermos
-    - influxdb
   become: true
   vars:
-    version: develop
+    version: add-logging-influxdb

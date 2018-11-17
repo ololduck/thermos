@@ -13,8 +13,8 @@
 - name: Python is installed
   package:
     name:
-      - python
-      - python-toml
+      - python3
+      - python3-pip
     state: present
 
 - name: Git is installed
@@ -30,6 +30,10 @@
     force: true
   notify: Restart service
 
+- name: Install dependencies
+  pip:
+    requirements: /opt/thermos/requirements.txt
+
 - name: Copy service file
   copy:
     src: thermostatd.service
@@ -43,9 +47,9 @@
   notify: Restart service
 
 - name: Create influx database
-  influx_database:
-    hostname: localhost
-    name: thermos
+  influxdb_database:
+    hostname: "{{hostvars['influx'].ansible_host}}"
+    database_name: thermos
 
 - name: Install & launch thermostat daemon
   systemd:

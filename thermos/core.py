@@ -1,11 +1,11 @@
-import time
-
 import logging
-from RPi import GPIO
+import time
 from datetime import datetime
 from glob import glob
-from influxdb import InfluxDBClient
 from signal import SIGINT, SIGTERM, signal
+
+from RPi import GPIO
+from influxdb import InfluxDBClient
 
 from thermos import Config
 
@@ -82,6 +82,7 @@ class ThermosActuator(object):
 
     def run(self):
         """Launches the mainloop"""
+        heating = False
         try:
             while self.should_run:
                 scheduled_temp = self.config.get_current_scheduled_temperature()
